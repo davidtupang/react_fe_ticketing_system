@@ -4,8 +4,8 @@ import axios from 'axios';
 const CreateIncident = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state
-  const [error, setError] = useState(''); // Add error state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,11 +15,21 @@ const CreateIncident = () => {
       return;
     }
 
-    setLoading(true); // Set loading to true while request is being processed
-    setError(''); // Clear previous errors
+    setLoading(true);
+    setError('');
 
     try {
-      await axios.post('/incidents', { name, description });
+      const token = localStorage.getItem('token'); // Retrieve token from local storage
+
+      await axios.post('/Tickets/create-incident',
+        { name, description },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token to request headers
+          },
+        }
+      );
+
       alert('Incident created successfully!');
       setName(''); // Clear form fields after success
       setDescription('');

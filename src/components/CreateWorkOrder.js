@@ -4,8 +4,8 @@ import axios from 'axios';
 const CreateWorkOrder = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false); // Add loading state
-  const [error, setError] = useState(''); // Add error state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,19 +16,30 @@ const CreateWorkOrder = () => {
       return;
     }
 
-    setLoading(true); // Set loading to true while request is being processed
-    setError(''); // Clear previous errors
+    setLoading(true);
+    setError('');
 
     try {
-      await axios.post('/work-orders', { name, description });
+      const token = localStorage.getItem('token'); // Retrieve token from local storage
+
+      await axios.post(
+        'http://localhost:3000/api/Tickets/create-workorder',
+        { name, description },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token to request headers
+          },
+        }
+      );
+
       alert('Work Order created successfully!');
-      setName(''); // Clear form fields after success
+      setName('');
       setDescription('');
     } catch (err) {
       console.error('Error creating work order:', err);
       setError('There was an error creating the work order. Please try again.');
     } finally {
-      setLoading(false); // Set loading to false when the request is done
+      setLoading(false);
     }
   };
 
@@ -36,7 +47,7 @@ const CreateWorkOrder = () => {
     <div>
       <h2>Create Work Order</h2>
       <form onSubmit={handleSubmit}>
-        {error && <div className="error">{error}</div>} {/* Display error if any */}
+        {error && <div className="error">{error}</div>}
         <input
           type="text"
           placeholder="Work Order Name"
