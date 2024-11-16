@@ -6,7 +6,7 @@ import IncidentsList from './components/IncidentsList';
 import CreateIncident from './components/CreateIncident';
 import WorkOrdersList from './components/WorkOrdersList';
 import CreateWorkOrder from './components/CreateWorkOrder';
-import Login from './components/login';
+import Login from './components/Login';
 import './App.css';
 
 axios.defaults.baseURL = 'http://localhost:3000/api';
