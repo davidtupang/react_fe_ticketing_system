@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from 'axios'; // Tambahkan file CSS untuk gaya
 
 const WorkOrdersList = () => {
   const [workOrders, setWorkOrders] = useState([]);
@@ -8,12 +8,12 @@ const WorkOrdersList = () => {
 
   useEffect(() => {
     const fetchWorkOrders = async () => {
-      const token = localStorage.getItem('token'); // Retrieve token from localStorage (or other storage)
+      const token = localStorage.getItem('token'); // Ambil token dari localStorage
 
       try {
         const response = await axios.get('/Tickets/list-workorders', {
           headers: {
-            Authorization: `Bearer ${token}`, // Add token to request headers
+            Authorization: `Bearer ${token}`, // Tambahkan token ke header permintaan
           },
         });
         setWorkOrders(response.data);
@@ -29,27 +29,27 @@ const WorkOrdersList = () => {
   }, []);
 
   return (
-    <div>
+    <div className="work-orders-container">
       <h2>Work Orders List</h2>
 
-      {loading && <p>Loading work orders...</p>}
-      {error && <div className="error">{error}</div>}
+      {loading && <p className="loading">Loading work orders...</p>}
+      {error && <div className="error-message">{error}</div>}
 
-      <ul>
-        {workOrders.length > 0 ? (
-          workOrders.map((workOrder) => (
-            <li key={workOrder.id}>
+      {workOrders.length > 0 ? (
+        <ul className="work-orders-list">
+          {workOrders.map((workOrder) => (
+            <li key={workOrder.id} className="work-order-card">
               <p><strong>Status:</strong> {workOrder.status}</p>
               <p><strong>Created At:</strong> {new Date(workOrder.createdAt).toLocaleString()}</p>
               <p><strong>Client Name:</strong> {workOrder.incident.clientName}</p>
               <p><strong>Description:</strong> {workOrder.incident.description}</p>
               <p><strong>Incident Status:</strong> {workOrder.incident.status}</p>
             </li>
-          ))
-        ) : (
-          <p>No work orders available.</p>
-        )}
-      </ul>
+          ))}
+        </ul>
+      ) : (
+        <p className="no-work-orders">No work orders available.</p>
+      )}
     </div>
   );
 };

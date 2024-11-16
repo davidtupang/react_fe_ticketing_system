@@ -48,7 +48,9 @@ function App() {
 
       {token ? (
         <>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="logout-button">
+          Log Out
+          </button>
           <Routes>
             <Route path="/incidents" element={<IncidentsList />} />
             <Route path="/create-incident" element={<CreateIncident />} />

@@ -1,70 +1,67 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const CreateWorkOrder = () => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [loading, setLoading] = useState(false);
+const WorkOrdersList = () => {
+  const [workOrders, setWorkOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Fungsi untuk mendapatkan data work orders
+  useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
-    // Validate that the name and description are provided
-    if (!name || !description) {
-      setError('Both fields are required!');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const token = localStorage.getItem('token'); // Retrieve token from local storage
-
-      await axios.post(
-        'http://localhost:3000/api/Tickets/create-workorder',
-        { name, description },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Add token to request headers
-          },
+        if (token) {
+          axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+        } else {
+          setError('Please log in to access work orders.');
+          setLoading(false);
+          return;
         }
-      );
 
-      alert('Work Order created successfully!');
-      setName('');
-      setDescription('');
-    } catch (err) {
-      console.error('Error creating work order:', err);
-      setError('There was an error creating the work order. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        const response = await axios.get('/Tickets/list-workorders');
+        setWorkOrders(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching work orders:', err);
+        setError('Failed to load work orders. Please try again later.');
+        setLoading(false);
+      }
+    };
+
+    fetchWorkOrders();
+  }, []);
 
   return (
-    <div>
-      <h2>Create Work Order</h2>
-      <form onSubmit={handleSubmit}>
-        {error && <div className="error">{error}</div>}
-        <input
-          type="text"
-          placeholder="Work Order Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <textarea
-          placeholder="Work Order Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Work Order'}
-        </button>
-      </form>
+    <div className="work-orders-container">
+      {/* Header dengan satu tombol Log Out */}
+      <div className="header">
+        <h2>Work Orders List</h2>
+      </div>
+
+      {/* Konten utama */}
+      {loading && <p className="loading">Loading work orders...</p>}
+      {error && <div className="error">{error}</div>}
+
+      <ul className="work-orders-list">
+        {workOrders.length > 0 ? (
+          workOrders.map((workOrder) => (
+            <li key={workOrder.id} className="work-order-card">
+              <strong>{workOrder.incident.clientName}</strong>
+              <span>{workOrder.incident.description}</span>
+              <span>Status: {workOrder.status}</span>
+              <span>
+                Created At: {new Date(workOrder.createdAt).toLocaleString()}
+              </span>
+            </li>
+          ))
+        ) : (
+          <p className="no-work-orders">No work orders available.</p>
+        )}
+      </ul>
     </div>
   );
 };
 
-export default CreateWorkOrder;
+export default WorkOrdersList;
