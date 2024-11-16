@@ -19,6 +19,7 @@ function App() {
   useEffect(() => {
     if (token) {
       axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+      axios.defaults.withCredentials = true;
       setError(null);
     } else {
       setError('Please log in to access the ticketing system.');
